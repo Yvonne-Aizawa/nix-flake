@@ -10,6 +10,7 @@ A NixOS flake configuration featuring an ephemeral root filesystem with btrfs sn
 - **Automatic Pre-rebuild Snapshots**: System automatically snapshots before `nixos-rebuild`
 - **Modular Design**: Uses flake-parts with import-tree for automatic module discovery
 - **Application Preservation**: Firefox and VS Code data automatically preserved
+- **UEFI Boot**: Uses systemd-boot with EFI System Partition
 
 ## Architecture
 
@@ -25,7 +26,7 @@ A NixOS flake configuration featuring an ephemeral root filesystem with btrfs sn
 
 ### How It Works
 
-1. On boot, the initrd deletes the current `/root` subvolume
+1. On boot, the initrd deletes the current `/root` subvolume (including nested subvolumes)
 2. A fresh snapshot is created from `/root-blank`
 3. The system boots into a clean state
 4. User data in `/persist` remains intact across reboots
@@ -34,32 +35,31 @@ A NixOS flake configuration featuring an ephemeral root filesystem with btrfs sn
 
 ### Prerequisites
 
-- A machine or VM with a disk available (default: `/dev/nvme0n1`)
+- A UEFI machine or VM with a disk available (default: `/dev/nvme0n1`)
 - NixOS installer ISO booted
 
 ### Steps
 
 1. Clone this repository:
    ```bash
-   git clone <repo-url> /tmp/nix_flake
+   git clone https://github.com/Yvonne-Aizawa/nix-flake.git /tmp/nix_flake
    cd /tmp/nix_flake
    ```
 
 2. Run the installation scripts in order:
    ```bash
    ./step1.sh    # Partition and format disk with disko
-   ./step2.sh    # Create blank root snapshot
-   ./step3.sh    # Install NixOS
+   ./step2.sh    # Create blank root snapshot and mount for install
+   ./step3.sh    # Install NixOS (also copies flake to /persist/flake)
    ./step4.sh    # Reboot
    ```
 
 ### Post-Installation
 
-Enable preservation for your user by adding to your configuration:
+The flake is available at `/persist/flake`. Rebuild with:
 
-```nix
-preservation.enable = true;
-preservation.user = "yourusername";
+```bash
+sudo nixos-rebuild switch --flake /persist/flake#desktopMachine
 ```
 
 ## Usage
@@ -127,16 +127,16 @@ modules = [
 
 ### Changing the Target Disk
 
-Edit `modules/machines/desktopMachine.nix` and modify:
+The configuration uses partition labels (`/dev/disk/by-partlabel/disk-main-root`) which are portable. To change the disk device, edit:
 
-1. The disko device:
+1. `modules/machines/desktopMachine.nix`:
    ```nix
    disk.main.device = "/dev/sda";  # or your target disk
    ```
 
-2. The initrd rollback service (`boot.initrd.systemd.services.rollback-root`):
-   - Update `after` to match your partition (e.g., `dev-sda2.device`)
-   - Update the `mount` command to use the correct partition
+2. `step2.sh` - update partition references (e.g., `/dev/sda1`, `/dev/sda2`)
+
+The partition labels and initrd rollback service do not need changes as they use disko-generated labels.
 
 ## Commands Reference
 
