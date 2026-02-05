@@ -85,9 +85,6 @@ snapshot-delete <name>
 
 ## Changing Target Disk
 
-When changing from `/dev/nvme0n1` to another disk, update:
-1. `modules/machines/desktopMachine.nix`:
-   - `disko.devices.disk.main.device`
-   - `boot.initrd.systemd.services.rollback-root` (after and mount command)
-2. `step2.sh` - partition references
-3. `modules/modules/snapshotModule.nix` - rollback script mount command
+The initrd and snapshot scripts use partition labels (`/dev/disk/by-partlabel/disk-main-root`) which are portable. When changing from `/dev/nvme0n1` to another disk, update:
+1. `modules/machines/desktopMachine.nix` - `disko.devices.disk.main.device`
+2. `step2.sh` - partition references for installation
