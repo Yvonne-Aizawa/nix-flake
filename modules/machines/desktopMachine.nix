@@ -32,13 +32,13 @@
       boot.initrd.systemd.services.rollback-root = {
         description = "Rollback root subvolume to blank snapshot";
         wantedBy = [ "initrd.target" ];
-        after = [ "dev-disk-by\\x2dpartlabel-root.device" ];
+        after = [ "dev-disk-by\\x2dpartlabel-disk\\x2dmain\\x2droot.device" ];
         before = [ "sysroot.mount" ];
         unitConfig.DefaultDependencies = "no";
         serviceConfig.Type = "oneshot";
         script = ''
           mkdir -p /mnt
-          mount -t btrfs /dev/disk/by-partlabel/root /mnt -o subvol=/
+          mount -t btrfs /dev/disk/by-partlabel/disk-main-root /mnt -o subvol=/
           if [ -e /mnt/root ]; then
             btrfs subvolume delete /mnt/root
           fi
