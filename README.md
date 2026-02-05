@@ -45,32 +45,12 @@ A NixOS flake configuration featuring an ephemeral root filesystem with btrfs sn
    cd /tmp/nix_flake
    ```
 
-2. Partition and format the disk using disko:
+2. Run the installation scripts in order:
    ```bash
-   sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko --flake .#desktopMachine
-   ```
-
-3. Create the blank root snapshot (required for ephemeral root):
-   ```bash
-   # Mount btrfs filesystem root to access all subvolumes
-   sudo mkdir -p /tmp/btrfs-root
-   sudo mount /dev/nvme0n1p2 /tmp/btrfs-root -o subvol=/
-
-   # Replace disko's empty subvolume with a snapshot of clean root
-   sudo btrfs subvolume delete /tmp/btrfs-root/root-blank
-   sudo btrfs subvolume snapshot /tmp/btrfs-root/root /tmp/btrfs-root/root-blank
-
-   sudo umount /tmp/btrfs-root
-   ```
-
-4. Install NixOS:
-   ```bash
-   sudo nixos-install --flake .#desktopMachine
-   ```
-
-5. Reboot into your new system:
-   ```bash
-   sudo reboot
+   ./step1.sh    # Partition and format disk with disko
+   ./step2.sh    # Create blank root snapshot
+   ./step3.sh    # Install NixOS
+   ./step4.sh    # Reboot
    ```
 
 ### Post-Installation
