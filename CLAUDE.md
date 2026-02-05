@@ -36,6 +36,11 @@ The system uses btrfs subvolumes with root wiped on every boot:
 
 Machine configs must set `preservation.enable = true` and `preservation.user = "<username>"` for preservation to work. User management is immutable (`users.mutableUsers = false`).
 
+**Boot Configuration:**
+- Uses UEFI with systemd-boot
+- 512M EFI System Partition (FAT32) at `/boot`
+- Default disk: `/dev/nvme0n1`
+
 **Application Module Pattern:**
 Application modules should declare their own preservation needs using `mkMerge`. Modules are auto-discovered but must be explicitly added to machine configurations:
 
@@ -65,6 +70,11 @@ nix flake show                     # List outputs
 nix build .#nixosConfigurations.desktopMachine.config.system.build.toplevel
 ```
 
+**Rebuild (on deployed system):**
+```bash
+sudo nixos-rebuild switch --flake /persist/flake#desktopMachine
+```
+
 **Snapshot commands (on deployed system):**
 ```bash
 snapshot [name]       # Create snapshot of /persist
@@ -72,3 +82,12 @@ snapshot-list         # List available snapshots
 rollback <name>       # Restore /persist from snapshot (requires reboot)
 snapshot-delete <name>
 ```
+
+## Changing Target Disk
+
+When changing from `/dev/nvme0n1` to another disk, update:
+1. `modules/machines/desktopMachine.nix`:
+   - `disko.devices.disk.main.device`
+   - `boot.initrd.systemd.services.rollback-root` (after and mount command)
+2. `step2.sh` - partition references
+3. `modules/modules/snapshotModule.nix` - rollback script mount command
