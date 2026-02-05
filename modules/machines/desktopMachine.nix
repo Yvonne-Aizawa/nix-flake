@@ -38,7 +38,7 @@
         serviceConfig.Type = "oneshot";
         script = ''
           mkdir -p /mnt
-          mount /dev/nvme0n1p2 /mnt -o subvol=/
+          mount -t btrfs /dev/nvme0n1p2 /mnt -o subvol=/
           if [ -e /mnt/root ]; then
             btrfs subvolume delete /mnt/root
           fi
