@@ -34,7 +34,7 @@ A NixOS flake configuration featuring an ephemeral root filesystem with btrfs sn
 
 ### Prerequisites
 
-- A machine or VM with a disk available (default: `/dev/sda`)
+- A machine or VM with a disk available (default: `/dev/nvme0n1`)
 - NixOS installer ISO booted
 
 ### Steps
@@ -52,7 +52,15 @@ A NixOS flake configuration featuring an ephemeral root filesystem with btrfs sn
 
 3. Create the blank root snapshot (required for ephemeral root):
    ```bash
-   sudo btrfs subvolume snapshot /mnt /mnt/root-blank
+   # Mount btrfs filesystem root to access all subvolumes
+   sudo mkdir -p /tmp/btrfs-root
+   sudo mount /dev/nvme0n1p2 /tmp/btrfs-root -o subvol=/
+
+   # Replace disko's empty subvolume with a snapshot of clean root
+   sudo btrfs subvolume delete /tmp/btrfs-root/root-blank
+   sudo btrfs subvolume snapshot /tmp/btrfs-root/root /tmp/btrfs-root/root-blank
+
+   sudo umount /tmp/btrfs-root
    ```
 
 4. Install NixOS:
@@ -139,13 +147,16 @@ modules = [
 
 ### Changing the Target Disk
 
-Edit `modules/machines/desktopMachine.nix` and modify the `device` field:
+Edit `modules/machines/desktopMachine.nix` and modify:
 
-```nix
-disk.main.device = "/dev/nvme0n1";  # or your target disk
-```
+1. The disko device:
+   ```nix
+   disk.main.device = "/dev/sda";  # or your target disk
+   ```
 
-Also update the initrd commands and rollback script to reference the correct device.
+2. The initrd rollback service (`boot.initrd.systemd.services.rollback-root`):
+   - Update `after` to match your partition (e.g., `dev-sda2.device`)
+   - Update the `mount` command to use the correct partition
 
 ## Commands Reference
 
