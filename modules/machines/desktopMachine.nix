@@ -23,8 +23,8 @@
       preservation.enable = true;
       preservation.user = "yvonne";
 
-      boot.loader.grub.enable = true;
-      boot.loader.grub.devices = lib.mkForce [ "/dev/nvme0n1" ];
+      boot.loader.systemd-boot.enable = true;
+      boot.loader.efi.canTouchEfiVariables = true;
 
       boot.initrd.supportedFilesystems = [ "btrfs" ];
       boot.initrd.systemd.enable = true;
@@ -55,9 +55,14 @@
             content = {
               type = "gpt";
               partitions = {
-                boot = {
-                  size = "1M";
-                  type = "EF02";
+                ESP = {
+                  size = "512M";
+                  type = "EF00";
+                  content = {
+                    type = "filesystem";
+                    format = "vfat";
+                    mountpoint = "/boot";
+                  };
                 };
                 root = {
                   size = "100%";
