@@ -25,15 +25,26 @@
 
       boot.loader.grub.enable = true;
 
-      boot.initrd.postDeviceCommands = lib.mkBefore ''
-        mkdir -p /mnt
-        mount /dev/nvme0n1p2 /mnt -o subvol=/
-        if [ -e /mnt/root ]; then
-          btrfs subvolume delete /mnt/root
-        fi
-        btrfs subvolume snapshot /mnt/root-blank /mnt/root
-        umount /mnt
-      '';
+      boot.initrd.supportedFilesystems = [ "btrfs" ];
+      boot.initrd.systemd.enable = true;
+      boot.initrd.systemd.extraBin.btrfs = "${pkgs.btrfs-progs}/bin/btrfs";
+      boot.initrd.systemd.services.rollback-root = {
+        description = "Rollback root subvolume to blank snapshot";
+        wantedBy = [ "initrd.target" ];
+        after = [ "dev-nvme0n1p2.device" ];
+        before = [ "sysroot.mount" ];
+        unitConfig.DefaultDependencies = "no";
+        serviceConfig.Type = "oneshot";
+        script = ''
+          mkdir -p /mnt
+          mount /dev/nvme0n1p2 /mnt -o subvol=/
+          if [ -e /mnt/root ]; then
+            btrfs subvolume delete /mnt/root
+          fi
+          btrfs subvolume snapshot /mnt/root-blank /mnt/root
+          umount /mnt
+        '';
+      };
 
       disko.devices = {
         disk = {
