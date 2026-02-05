@@ -24,7 +24,7 @@
       preservation.user = "yvonne";
 
       boot.loader.grub.enable = true;
-      # grub.device is auto-configured by disko via the EF02 partition
+      boot.loader.grub.devices = lib.mkForce [ "/dev/nvme0n1" ];
 
       boot.initrd.supportedFilesystems = [ "btrfs" ];
       boot.initrd.systemd.enable = true;
