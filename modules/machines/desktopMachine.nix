@@ -5,6 +5,7 @@
       inputs.disko.nixosModules.disko
       self.nixosModules.desktopModule
       self.nixosModules.firefoxModule
+      self.nixosModules.preservationModule
     ];
   };
 

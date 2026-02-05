@@ -1,11 +1,15 @@
 { inputs, ... }:
 {
-
   flake.nixosModules.firefoxModule =
-    { pkgs, ... }:
+    { config, lib, ... }:
     {
-      programs.firefox.enable = true;
-
+      config = lib.mkMerge [
+        { programs.firefox.enable = true; }
+        (lib.mkIf config.preservation.enable {
+          preservation.preserveAt."/persist" = {
+            users.${config.preservation.user}.directories = [ ".mozilla" ];
+          };
+        })
+      ];
     };
-
 }
