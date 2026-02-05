@@ -5,6 +5,10 @@
     {
       config = lib.mkMerge [
         {
+          users.mutableUsers = false;
+
+          users.users.root.initialPassword = "changeme";
+
           users.users.yvonne = {
             isNormalUser = true;
             extraGroups = [ "wheel" ];
