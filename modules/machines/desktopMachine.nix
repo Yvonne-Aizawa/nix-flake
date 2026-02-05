@@ -8,6 +8,7 @@
       self.nixosModules.vscodeModule
       self.nixosModules.preservationModule
       self.nixosModules.snapshotModule
+      self.nixosModules.hyprlandModule
     ];
   };
 
@@ -21,7 +22,7 @@
 
       boot.initrd.postDeviceCommands = lib.mkBefore ''
         mkdir -p /mnt
-        mount /dev/sda2 /mnt -o subvol=/
+        mount /dev/nvme0n1p2 /mnt -o subvol=/
         if [ -e /mnt/root ]; then
           btrfs subvolume delete /mnt/root
         fi
@@ -33,7 +34,7 @@
         disk = {
           main = {
             type = "disk";
-            device = "/dev/sda";
+            device = "/dev/nvme0n1";
             content = {
               type = "gpt";
               partitions = {
