@@ -10,8 +10,10 @@ NixOS flake configuration using `flake-parts` and `import-tree` for automatic mo
 
 **Flake Structure:**
 - `flake.nix` - Entry point using flake-parts with import-tree to auto-import `modules/`
-- `modules/modules/` - NixOS modules (exposed via `flake.nixosModules.<name>`)
+- `modules/modules/` - NixOS modules (auto-discovered, exposed via `flake.nixosModules.<name>`)
 - `modules/machines/` - Machine configurations (exposed via `flake.nixosConfigurations.<name>`)
+
+**Key Inputs:** nixpkgs (unstable), disko (disk partitioning), preservation (persistent state management)
 
 **Module Pattern:**
 Each `.nix` file receives `{ inputs, self, ... }` and returns an attribute set merged into flake outputs:
@@ -32,22 +34,28 @@ The system uses btrfs subvolumes with root wiped on every boot:
 - `/nix` - Nix store
 - `/snapshots` - Btrfs snapshots for rollback
 
+Machine configs must set `preservation.enable = true` and `preservation.user = "<username>"` for preservation to work. User management is immutable (`users.mutableUsers = false`).
+
 **Application Module Pattern:**
-Application modules should declare their own preservation needs using `mkMerge`:
+Application modules should declare their own preservation needs using `mkMerge`. Modules are auto-discovered but must be explicitly added to machine configurations:
 
 ```nix
-{ config, lib, ... }:
+{ inputs, ... }:
 {
-  config = lib.mkMerge [
-    { /* app config */ }
-    (lib.mkIf config.preservation.enable {
-      preservation.preserveAt."/persist" = {
-        users.${config.preservation.user}.directories = [ ".app-data" ];
-      };
-    })
-  ];
-};
+  flake.nixosModules.myAppModule = { config, lib, pkgs, ... }: {
+    config = lib.mkMerge [
+      { environment.systemPackages = [ pkgs.myapp ]; }
+      (lib.mkIf config.preservation.enable {
+        preservation.preserveAt."/persist" = {
+          users.${config.preservation.user}.directories = [ ".config/myapp" ];
+        };
+      })
+    ];
+  };
+}
 ```
+
+Then add `self.nixosModules.myAppModule` to the machine's `modules` list.
 
 ## Commands
 

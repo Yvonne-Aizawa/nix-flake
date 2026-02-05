@@ -81,7 +81,7 @@
         echo "Performing rollback..."
         # Mount the btrfs root to manipulate subvolumes
         TMPDIR=$(mktemp -d)
-        mount /dev/sda2 "$TMPDIR" -o subvol=/
+        mount /dev/nvme0n1p2 "$TMPDIR" -o subvol=/
 
         # Delete current persist and restore from snapshot
         ${pkgs.btrfs-progs}/bin/btrfs subvolume delete "$TMPDIR/persist"
