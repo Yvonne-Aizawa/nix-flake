@@ -17,7 +17,8 @@ sudo umount /tmp/btrfs-root
 
 # Remount everything for nixos-install
 sudo mount /dev/nvme0n1p2 /mnt -o subvol=/root,compress=zstd,noatime
-sudo mkdir -p /mnt/{nix,persist,snapshots}
+sudo mkdir -p /mnt/{boot,nix,persist,snapshots}
+sudo mount /dev/nvme0n1p1 /mnt/boot
 sudo mount /dev/nvme0n1p2 /mnt/nix -o subvol=/nix,compress=zstd,noatime
 sudo mount /dev/nvme0n1p2 /mnt/persist -o subvol=/persist,compress=zstd,noatime
 sudo mount /dev/nvme0n1p2 /mnt/snapshots -o subvol=/snapshots,compress=zstd,noatime
