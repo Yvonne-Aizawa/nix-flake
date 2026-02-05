@@ -4,38 +4,63 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a NixOS flake configuration using `flake-parts` and `import-tree` for automatic module discovery.
+NixOS flake configuration using `flake-parts` and `import-tree` for automatic module discovery. Features an ephemeral root filesystem with btrfs snapshots for persistence and rollback.
 
 ## Architecture
 
 **Flake Structure:**
-- `flake.nix` - Main entry point using flake-parts with import-tree to auto-import everything under `modules/`
-- `modules/` - All flake outputs organized by type:
-  - `modules/modules/` - NixOS modules (exposed via `flake.nixosModules.<name>`)
-  - `modules/machines/` - Machine configurations (exposed via `flake.nixosConfigurations.<name>`)
-  - `modules/packages/` - Custom packages (would be exposed via `flake.packages`)
+- `flake.nix` - Entry point using flake-parts with import-tree to auto-import `modules/`
+- `modules/modules/` - NixOS modules (exposed via `flake.nixosModules.<name>`)
+- `modules/machines/` - Machine configurations (exposed via `flake.nixosConfigurations.<name>`)
 
 **Module Pattern:**
-Each `.nix` file in `modules/` receives `{ inputs, self, ... }` and returns an attribute set that gets merged into the flake outputs. Use `flake.<output-type>.<name>` to add outputs:
+Each `.nix` file receives `{ inputs, self, ... }` and returns an attribute set merged into flake outputs:
 
 ```nix
 { inputs, self, ... }:
 {
-  flake.nixosModules.myModule = { pkgs, ... }: {
+  flake.nixosModules.myModule = { pkgs, lib, config, ... }: {
     # module configuration
   };
 }
 ```
 
+**Ephemeral Root + Preservation:**
+The system uses btrfs subvolumes with root wiped on every boot:
+- `/root` - Wiped on boot (restored from `/root-blank`)
+- `/persist` - Persistent user data (managed by preservation module)
+- `/nix` - Nix store
+- `/snapshots` - Btrfs snapshots for rollback
+
+**Application Module Pattern:**
+Application modules should declare their own preservation needs using `mkMerge`:
+
+```nix
+{ config, lib, ... }:
+{
+  config = lib.mkMerge [
+    { /* app config */ }
+    (lib.mkIf config.preservation.enable {
+      preservation.preserveAt."/persist" = {
+        users.${config.preservation.user}.directories = [ ".app-data" ];
+      };
+    })
+  ];
+};
+```
+
 ## Commands
 
 ```bash
-# Check flake syntax and evaluate outputs
-nix flake check
-
-# Build a NixOS configuration
+nix flake check                    # Validate flake
+nix flake show                     # List outputs
 nix build .#nixosConfigurations.desktopMachine.config.system.build.toplevel
+```
 
-# List all flake outputs
-nix flake show
+**Snapshot commands (on deployed system):**
+```bash
+snapshot [name]       # Create snapshot of /persist
+snapshot-list         # List available snapshots
+rollback <name>       # Restore /persist from snapshot (requires reboot)
+snapshot-delete <name>
 ```
