@@ -9,6 +9,7 @@
       self.nixosModules.preservationModule
       self.nixosModules.snapshotModule
       self.nixosModules.hyprlandModule
+      self.nixosModules.userModule
     ];
   };
 
@@ -16,7 +17,11 @@
     { pkgs, lib, ... }:
     {
       nixpkgs.hostPlatform = "x86_64-linux";
+      nixpkgs.config.allowUnfree = true;
       system.stateVersion = "24.11";
+
+      preservation.enable = true;
+      preservation.user = "yvonne";
 
       boot.loader.grub.enable = true;
 

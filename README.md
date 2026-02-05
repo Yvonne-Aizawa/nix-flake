@@ -52,7 +52,7 @@ A NixOS flake configuration featuring an ephemeral root filesystem with btrfs sn
 
 3. Create the blank root snapshot (required for ephemeral root):
    ```bash
-   sudo btrfs subvolume snapshot /mnt/root /mnt/root-blank
+   sudo btrfs subvolume snapshot /mnt /mnt/root-blank
    ```
 
 4. Install NixOS:
