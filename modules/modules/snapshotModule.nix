@@ -1,7 +1,12 @@
 { inputs, ... }:
 {
   flake.nixosModules.snapshotModule =
-    { pkgs, lib, config, ... }:
+    {
+      pkgs,
+      lib,
+      config,
+      ...
+    }:
     let
       snapshotScript = pkgs.writeShellScriptBin "snapshot" ''
         set -euo pipefail

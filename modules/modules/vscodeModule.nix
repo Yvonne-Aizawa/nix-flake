@@ -1,7 +1,12 @@
 { inputs, ... }:
 {
   flake.nixosModules.vscodeModule =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       config = lib.mkMerge [
         { environment.systemPackages = [ pkgs.vscode ]; }

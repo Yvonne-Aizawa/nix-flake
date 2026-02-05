@@ -49,20 +49,32 @@
                     subvolumes = {
                       "/root" = {
                         mountpoint = "/";
-                        mountOptions = [ "compress=zstd" "noatime" ];
+                        mountOptions = [
+                          "compress=zstd"
+                          "noatime"
+                        ];
                       };
                       "/root-blank" = { };
                       "/persist" = {
                         mountpoint = "/persist";
-                        mountOptions = [ "compress=zstd" "noatime" ];
+                        mountOptions = [
+                          "compress=zstd"
+                          "noatime"
+                        ];
                       };
                       "/nix" = {
                         mountpoint = "/nix";
-                        mountOptions = [ "compress=zstd" "noatime" ];
+                        mountOptions = [
+                          "compress=zstd"
+                          "noatime"
+                        ];
                       };
                       "/snapshots" = {
                         mountpoint = "/snapshots";
-                        mountOptions = [ "compress=zstd" "noatime" ];
+                        mountOptions = [
+                          "compress=zstd"
+                          "noatime"
+                        ];
                       };
                     };
                   };
