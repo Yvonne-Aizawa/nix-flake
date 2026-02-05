@@ -29,7 +29,11 @@
 
       boot.initrd.supportedFilesystems = [ "btrfs" ];
       boot.initrd.systemd.enable = true;
-      boot.initrd.systemd.extraBin.btrfs = "${pkgs.btrfs-progs}/bin/btrfs";
+      boot.initrd.systemd.extraBin = {
+        btrfs = "${pkgs.btrfs-progs}/bin/btrfs";
+        cut = "${pkgs.coreutils}/bin/cut";
+        tac = "${pkgs.coreutils}/bin/tac";
+      };
       boot.initrd.systemd.services.rollback-root = {
         description = "Rollback root subvolume to blank snapshot";
         wantedBy = [ "initrd.target" ];
@@ -41,6 +45,10 @@
           mkdir -p /mnt
           mount -t btrfs /dev/disk/by-partlabel/disk-main-root /mnt -o subvol=/
           if [ -e /mnt/root ]; then
+            # Delete nested subvolumes first (deepest first)
+            btrfs subvolume list -o /mnt/root | cut -f9 -d' ' | tac | while read subvol; do
+              btrfs subvolume delete "/mnt/$subvol"
+            done
             btrfs subvolume delete /mnt/root
           fi
           btrfs subvolume snapshot /mnt/root-blank /mnt/root
