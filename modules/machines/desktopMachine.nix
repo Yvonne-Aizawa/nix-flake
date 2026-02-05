@@ -10,6 +10,7 @@
       self.nixosModules.snapshotModule
       self.nixosModules.hyprlandModule
       self.nixosModules.userModule
+      self.nixosModules.gitModule
     ];
   };
 
