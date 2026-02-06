@@ -6,7 +6,8 @@
       config = lib.mkMerge [
         { programs.hyprland.enable = true;
         environment.systemPackages = [
-pkgs.kitty
+           pkgs.kitty
+  	   pkgs.hyprlauncher
 	]; }
       ];
     };

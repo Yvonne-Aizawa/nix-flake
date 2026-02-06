@@ -7,7 +7,7 @@
         { programs.firefox.enable = true; }
         (lib.mkIf config.preservation.enable {
           preservation.preserveAt."/persist" = {
-            users.${config.preservation.user}.directories = [ ".mozilla" ];
+            users.${config.preservation.user}.directories = [ ".config/mozilla" ];
           };
         })
       ];

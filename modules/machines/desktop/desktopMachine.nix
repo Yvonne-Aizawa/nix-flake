@@ -4,11 +4,14 @@
     modules = [
       inputs.disko.nixosModules.disko
       self.nixosModules.desktopModule
+      self.nixosModules.desktopHardware
       self.nixosModules.firefoxModule
       self.nixosModules.vscodeModule
+      self.nixosModules.claudeCodeModule
       self.nixosModules.preservationModule
       self.nixosModules.snapshotModule
       self.nixosModules.hyprlandModule
+      self.nixosModules.kdeModule
       self.nixosModules.userModule
       self.nixosModules.gitModule
     ];
@@ -17,6 +20,7 @@
   flake.nixosModules.desktopModule =
     { pkgs, lib, ... }:
     {
+
       nixpkgs.hostPlatform = "x86_64-linux";
       nixpkgs.config.allowUnfree = true;
       system.stateVersion = "24.11";
