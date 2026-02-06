@@ -1,11 +1,16 @@
 { inputs, ... }:
 {
   flake.nixosModules.claudeCodeModule =
-    { pkgs,config,lib, ... }:
+    {
+      pkgs,
+      config,
+      lib,
+      ...
+    }:
     {
 
-            config = lib.mkMerge [
-        {       environment.systemPackages = [ pkgs.claude-code ]; }
+      config = lib.mkMerge [
+        { environment.systemPackages = [ pkgs.claude-code ]; }
         (lib.mkIf config.preservation.enable {
           preservation.preserveAt."/persist" = {
             users.${config.preservation.user} = {

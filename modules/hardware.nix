@@ -1,8 +1,4 @@
 { inputs, ... }:
 {
-  flake.nixosModules.desktopHardware =
-  import ../hardware/desktop.nix;
+  flake.nixosModules.desktopHardware = import ../hardware/desktop.nix;
 }
-
-
-

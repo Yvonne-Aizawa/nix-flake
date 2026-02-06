@@ -1,7 +1,12 @@
 { inputs, ... }:
 {
   flake.nixosModules.userModule =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       config = lib.mkMerge [
         {

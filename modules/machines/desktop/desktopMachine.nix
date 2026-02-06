@@ -6,6 +6,7 @@
       self.nixosModules.desktopModule
       self.nixosModules.desktopHardware
       self.nixosModules.firefoxModule
+      self.homeModules.firefoxModule
       self.nixosModules.vscodeModule
       self.nixosModules.claudeCodeModule
       self.nixosModules.preservationModule
@@ -24,6 +25,10 @@
       nixpkgs.hostPlatform = "x86_64-linux";
       nixpkgs.config.allowUnfree = true;
       system.stateVersion = "24.11";
+      nix.settings.experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
 
       preservation.enable = true;
       preservation.user = "yvonne";
