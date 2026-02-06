@@ -6,7 +6,6 @@
       self.nixosModules.desktopModule
       self.nixosModules.desktopHardware
       self.nixosModules.firefoxModule
-      self.homeModules.firefoxModule
       self.nixosModules.vscodeModule
       self.nixosModules.claudeCodeModule
       self.nixosModules.preservationModule
@@ -15,6 +14,8 @@
       self.nixosModules.kdeModule
       self.nixosModules.userModule
       self.nixosModules.gitModule
+      self.nixosModules.signalModule
+      self.nixosModules.openRgbModule
     ];
   };
 

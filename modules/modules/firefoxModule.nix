@@ -22,7 +22,4 @@
         })
       ];
     };
-  flake.homeModules.firefoxModule = {
-
-  };
 }

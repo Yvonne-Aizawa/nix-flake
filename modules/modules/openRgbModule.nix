@@ -1,19 +1,20 @@
 { inputs, ... }:
 {
-  flake.nixosModules.signalModule =
+  flake.nixosModules.openRgbModule =
     {
       config,
       lib,
       self,
-      pkgs,
       ...
     }:
     {
       config = lib.mkMerge [
-        { environment.systemPackages = [ pkgs.signal-desktop ]; }
+        {
+          services.hardware.openrgb.enable = true;
+        }
         (lib.mkIf config.preservation.enable {
           preservation.preserveAt."/persist" = {
-            users.${config.preservation.user}.directories = [ ".config/Signal" ];
+            users.${config.preservation.user}.directories = [ ".config/OpenRGB" ];
           };
         })
       ];
